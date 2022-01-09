@@ -1,17 +1,15 @@
-# icc
+# ICC-es (forked icc)
 
-JavaScript module to parse International Color Consortium (ICC) profiles.
+JavaScript ES module to parse International Color Consortium (ICC) profiles.
 
-## Installation
-
-	npm install icc
+forked from [icc by lovell](https://github.com/lovell/icc)
 
 ## Usage
 
 ```javascript
-import { parse } from 'icc';
-const profileData = fs.readFileSync('sRGB_IEC61966-2-1_black_scaled.icc');
-const profile = parse(profileData);
+import { ICC } from "https://taisukef.github.io/ICC-es/ICC.js";
+const profileData = await Deno.readFile("sRGB_IEC61966-2-1_black_scaled.icc");
+const profile = ICC.parse(profileData);
 console.dir(profile);
 ```
 outputs:
@@ -31,7 +29,11 @@ outputs:
 
 ### parse(data)
 
-Parses `data`, a Buffer containing a raw ICC profile, returning an Object of key/value pairs.
+Parses `data`, a Uint8Array containing a raw ICC profile, returning an Object of key/value pairs.
+
+## todo
+
+fix test & CI for Deno
 
 ## Licence
 

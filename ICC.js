@@ -1,4 +1,4 @@
-'use strict';
+import { Buffer } from "https://taisukef.github.io/buffer/Buffer.js";
 
 // http://www.color.org/profileheader.xalter
 
@@ -61,7 +61,8 @@ const readStringUTF16BE = (buffer, start, end) => {
 
 const invalid = (reason) => new Error(`Invalid ICC profile: ${reason}`);
 
-module.exports.parse = (buffer) => {
+const parse = (bin) => {
+  const buffer = new Buffer(bin);
   // Verify expected length
   const size = buffer.readUInt32BE(0);
   if (size !== buffer.length) {
@@ -139,3 +140,7 @@ module.exports.parse = (buffer) => {
   }
   return profile;
 };
+
+const ICC = { parse };
+
+export { ICC };
