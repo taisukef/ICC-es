@@ -41,6 +41,9 @@ const tagMap = {
   cprt: 'copyright',
   dmdd: 'deviceModelDescription',
   vued: 'viewingConditionsDescription',
+  vued: 'viewingConditionsDescription',
+  wtpt: 'whitepoint',
+  kTRC: 'grayToneReproductionCurve',
 };
 
 const getContentAtOffsetAsString = (buffer, offset) => {
@@ -105,19 +108,15 @@ const parse = (bin) => {
         throw invalid('tag offset out of bounds');
       }
       const tagType = getContentAtOffsetAsString(buffer, tagOffset);
-      // desc
       if (tagType === 'desc') {
         const tagValueSize = buffer.readUInt32BE(tagOffset + 8);
         if (tagValueSize > tagSize) {
           throw invalid(`description tag value size out of bounds for ${tagSignature}`);
         }
         profile[tagMap[tagSignature]] = buffer.slice(tagOffset + 12, tagOffset + tagValueSize + 11).toString();
-      }
-      // text
-      if (tagType === 'text') {
+      } else if (tagType === 'text') {
         profile[tagMap[tagSignature]] = buffer.slice(tagOffset + 8, tagOffset + tagSize - 7).toString();
-      }
-      if (tagType === 'mluc' && tagSignature in tagMap) {
+      } else if (tagType === 'mluc' && tagSignature in tagMap) {
         // 4 bytes signature, 4 bytes reserved (must be 0), 4 bytes number of names, 4 bytes name record size (must be 12)
         const numberOfNames = buffer.readUInt32BE(tagOffset + 8);
         const nameRecordSize = buffer.readUInt32BE(tagOffset + 12);
@@ -134,6 +133,22 @@ const parse = (bin) => {
           const nameStop = nameStart + nameLength;
           profile[tagMap[tagSignature]] = readStringUTF16BE(buffer, nameStart, nameStop);
         }
+      } else if (tagType === 'curv') {
+        const entryCount = buffer.readUInt32BE(tagOffset + 8);
+        const entries = [];
+        if (12 + 2 * entryCount > tagSize) {
+          throw new Error('Invalid ICC profile: Curve tag value size out of bounds for ' + tagSignature);
+        }
+        for (let i = 0; i < entryCount; i++) {
+          entries.push(buffer.readUInt16BE(tagOffset + 12 + 2 * i));
+        }
+        profile[tagMap[tagSignature]] = entries;
+      } else if (tagType === 'XYZ') {
+        profile[tagMap[tagSignature]] = [
+          buffer.readInt16BE(tagOffset + 8),
+          buffer.readInt16BE(tagOffset + 12),
+          buffer.readInt16BE(tagOffset + 16)
+        ];
       }
     }
     tagHeaderOffset = tagHeaderOffset + 12;
