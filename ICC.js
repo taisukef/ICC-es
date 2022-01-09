@@ -8,14 +8,14 @@ const versionMap = {
   0x02400000: '2.4',
   0x04000000: '4.0',
   0x04200000: '4.2',
-  0x04300000: '4.3'
+  0x04300000: '4.3',
 };
 
 const intentMap = {
   0: 'Perceptual',
   1: 'Relative',
   2: 'Saturation',
-  3: 'Absolute'
+  3: 'Absolute',
 };
 
 const valueMap = {
@@ -33,14 +33,14 @@ const valueMap = {
   msft: 'Microsoft',
   sunw: 'Sun Microsystems',
   sgi: 'Silicon Graphics',
-  tgnt: 'Taligent'
+  tgnt: 'Taligent',
 };
 
 const tagMap = {
   desc: 'description',
   cprt: 'copyright',
   dmdd: 'deviceModelDescription',
-  vued: 'viewingConditionsDescription'
+  vued: 'viewingConditionsDescription',
 };
 
 const getContentAtOffsetAsString = (buffer, offset) => {
@@ -87,7 +87,7 @@ const parse = (bin) => {
     [40, 'platform'],
     [48, 'manufacturer'],
     [52, 'model'],
-    [80, 'creator']
+    [80, 'creator'],
   ].forEach(attr => {
     if (hasContentAtOffset(buffer, attr[0])) {
       profile[attr[1]] = getContentAtOffsetAsString(buffer, attr[0]);
